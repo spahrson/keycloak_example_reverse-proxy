@@ -1,0 +1,49 @@
+version: '3.3'
+
+volumes:
+  postgres_data:
+    driver: local
+
+services:
+
+  nginx:
+    image: quay.io/bitnami/nginx:1.19
+    ports:
+      - "8080:8080"
+      - "8443:8443"
+    volumes:
+      - ./nginx.conf:/opt/bitnami/nginx/conf/server_blocks/example.conf
+
+  postgres:
+    image: postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: keycloak
+      POSTGRES_USER: keycloak
+      POSTGRES_PASSWORD: password
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:12.0.2
+    environment:
+      DB_VENDOR: POSTGRES
+      DB_ADDR: postgres
+      DB_DATABASE: keycloak
+      DB_USER: keycloak
+      DB_SCHEMA: public
+      DB_PASSWORD: password
+      KEYCLOAK_USER: admin
+      KEYCLOAK_PASSWORD: password
+      KEYCLOAK_LOGLEVEL: DEBUG
+      PROXY_ADDRESS_FORWARDING: "true"
+      JAVA_OPTS: >-
+        -Djboss.socket.binding.port-offset=100
+        -Djava.net.preferIPv4Stack=true
+        -Djava.net.preferIPv4Addresses=true
+        -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:8100
+
+    ports:
+      - 8180:8180
+      - 8100:8000
+    depends_on:
+      - postgres

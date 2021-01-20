@@ -1,0 +1,18 @@
+# Keycloak-Example: Setup behind a NGINX reverse-proxy 
+
+This is a minimal example for running Keycloak behind a NGINX reverse proxy using docker-compose.
+
+Keycloak is responding using the `X-Forward-` proxy headers. So there is no hard-coded url on Keycloak side. Means you are able to communicate with Keycloak using both the proxy and the direct address.
+
+Alternatively you could fix the url using `frontendUrl` and `forceBackendUrlToFrontendUrl` as documented link:https://www.keycloak.org/docs/latest/server_installation/#_hostname[here].
+
+## Installation
+
+. Use `docker-compose up` to start the example
+. Extend your `/etc/hosts` file with:
++
+[source,bash]
+----
+127.0.0.1 auth.example.com
+----
+. Keycloak will be available at `https://auth.example.com:8443` and `http://localhost:8180`.
